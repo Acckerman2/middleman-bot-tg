@@ -25,15 +25,13 @@ logger = logging.getLogger(__name__)
 
 def _user_display(message: Message) -> str:
     """
-    Return a privacy-safe label for a user, e.g. '@alice' or 'User #3c9f'.
-    Never exposes the numeric user_id.
+    Return the user's name and ID.
     """
     user = message.from_user
+    name = user.full_name
     if user.username:
-        return f"@{user.username}"
-    # Deterministic short hash so the owner can distinguish multiple anon users
-    short = format(user.id, "x")[-4:]
-    return f"User #{short}"
+        return f"{name} (@{user.username}) [ID: {user.id}]"
+    return f"{name} [ID: {user.id}]"
 
 
 async def forward_to_owner(bot: Bot, owner_id: int, message: Message) -> None:
