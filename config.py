@@ -36,9 +36,9 @@ MONGO_URI: str = _require("MONGO_URI")
 MONGO_DB_NAME: str = _optional("MONGO_DB_NAME", "middleman_bot")
 
 WELCOME_MESSAGE: str = _optional(
-    "WELCOME_MESSAGE",
-    "👋 Hello! Send me a message and I'll pass it along. "
-    "I typically reply within a few hours.",
+    "👋 Welcome!",
+    "You may send your message here, and it will be securely forwarded to the owner. Your identity and personal details are kept strictly confidential and will not be disclosed. "
+    " ⏱️ Responses are typically provided within a few hours.  Please type your message to begin.",
 )
 
 AWAY_MESSAGE: str = _optional("AWAY_MESSAGE", "")

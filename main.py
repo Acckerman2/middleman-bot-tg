@@ -120,6 +120,9 @@ async def main() -> None:
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
 
+    # Ensure no residual webhooks interfere with long-polling
+    await bot.delete_webhook(drop_pending_updates=True)
+
     logger.info("Entering long-poll loop.")
     await dp.start_polling(
         bot,
