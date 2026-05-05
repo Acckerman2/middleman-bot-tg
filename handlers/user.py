@@ -18,6 +18,7 @@ import config
 import db
 from services.rate_limiter import is_rate_limited
 from services.router import forward_to_owner
+from services.ai_agent import analyze_message_with_ai
 
 logger = logging.getLogger(__name__)
 router = Router(name="user")
@@ -84,12 +85,22 @@ async def handle_user_message(message: Message, bot: Bot) -> None:
         logger.warning("Rate-limited user %d", user.id)
         return
 
-    # Forward to owner
+    # Use AI to analyze the message
+    user_text = message.text or message.caption or "Media attachment sent"
+    ai_result = {"reply": "I'm having trouble analyzing your request, forwarding it to the admin.", "is_important": True}
+    
     try:
-        await forward_to_owner(bot, config.OWNER_ID, message)
-        await message.answer("✅ Your message has been sent!")
-    except Exception as exc:  # noqa: BLE001
-        logger.error("Error forwarding message from user %d: %s", user.id, exc)
-        await message.answer(
-            "❌ Something went wrong sending your message. Please try again later."
-        )
+        if user_text:
+            ai_result = await analyze_message_with_ai(user_text)
+    except Exception as e:
+        logger.error("AI Analysis failed: %s", e)
+
+    # Reply to the user with the AI's response
+    await message.answer(ai_result["reply"])
+
+    # Forward to owner only if the AI determines it's important
+    if ai_result["is_important"]:
+        try:
+            await forward_to_owner(bot, config.OWNER_ID, message)
+        except Exception as exc:  # noqa: BLE001
+            logger.error("Error forwarding message from user %d: %s", user.id, exc)

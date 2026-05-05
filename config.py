@@ -33,6 +33,8 @@ OWNER_ID: int = int(_require("OWNER_ID"))
 MONGO_URI: str = _require("MONGO_URI")
 
 # ── Optional / defaults ───────────────────────────────────────────────────────
+MISTRAL_API_KEY: str = _optional("MISTRAL_API_KEY", "")
+
 MONGO_DB_NAME: str = _optional("MONGO_DB_NAME", "middleman_bot")
 
 WELCOME_MESSAGE: str = _optional(
