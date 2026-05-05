@@ -17,7 +17,9 @@ Router priority matters:
 import asyncio
 import logging
 import sys
+import os
 
+from aiohttp import web
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
@@ -54,8 +56,22 @@ def build_dispatcher() -> Dispatcher:
 
 # ── Startup / shutdown hooks ──────────────────────────────────────────────────
 
+async def handle_ping(request):
+    return web.Response(text="Bot is running")
+
 async def on_startup(bot: Bot) -> None:
-    logger.info("Starting Telegram Middleman Bot…")
+    logger.info("Starting Telegram Middleman Botâ€¦")
+
+    # Start dummy web server for Render Web Service port binding
+    port = int(os.environ.get("PORT", 8080))
+    app = web.Application()
+    app.router.add_get('/', handle_ping)
+    app.router.add_get('/health', handle_ping)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, '0.0.0.0', port)
+    await site.start()
+    logger.info("Dummy web server started on port %d", port)
 
     # Verify MongoDB is reachable before accepting updates
     if not db.ping():
